@@ -1,1 +1,17 @@
-import{Trophy,Star,Flame}from'lucide-react';export default function Complete({home}:{home:()=>void}){return <main className="screen complete"><div className="trophy"><Trophy size={70}/></div><p className="eyebrow">LESSON COMPLETE</p><h1>You powered up!</h1><p>Great focus. Every practice makes reading stronger.</p><div className="rewardGrid"><div><Star/><b>+20 XP</b><span>earned today</span></div><div><Flame/><b>6 days</b><span>streak</span></div></div><button className="primary" onClick={home}>Back Home</button></main>}
+import { Star, Trophy } from 'lucide-react';
+export default function Complete({home}:{home:()=>void}) {
+  const s = JSON.parse(localStorage.getItem('lexi_last_summary') || '{}');
+  const mins = Math.floor((s.durationMs || 0)/60000);
+  const secs = Math.floor(((s.durationMs || 0)%60000)/1000).toString().padStart(2,'0');
+  return <main className="complete-screen">
+    <Trophy size={64}/><h1>Lesson Complete!</h1><p>You showed your sound-symbol superpowers.</p>
+    <div className="star-badge"><Star fill="currentColor"/> +{s.stars || 0} stars</div>
+    <div className="summary-grid">
+      <div><strong>6/6</strong><span>activities</span></div>
+      <div><strong>{s.accuracy ?? 0}%</strong><span>first try</span></div>
+      <div><strong>{mins}:{secs}</strong><span>time</span></div>
+      <div><strong>+{s.xp || 38}</strong><span>XP</span></div>
+    </div>
+    <button className="primary light" onClick={home}>Back Home</button>
+  </main>
+}

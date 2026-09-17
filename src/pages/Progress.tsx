@@ -1,1 +1,17 @@
-import{getAttempts}from'../services/lexi';export default function Progress(){const a=getAttempts(),correct=a.filter(x=>x.correct).length,acc=a.length?Math.round(correct/a.length*100):0;return <main className="screen"><p className="eyebrow">PARENT DASHBOARD</p><h1>Reading progress</h1><div className="tabs"><b>Overview</b><span>Skills</span><span>Sessions</span></div><div className="stats parent"><div><b>{a.length}</b><span>Attempts</span></div><div><b>{acc}%</b><span>Accuracy</span></div><div><b>6</b><span>Day streak</span></div></div><h3>Skill progress</h3>{[['Sound awareness',78],['Sound-symbol mapping',64],['Decoding',48],['Fluency',31]].map(([n,v]:any)=><div className="skill" key={n}><div><span>{n}</span><b>{v}%</b></div><div className="bar"><i style={{width:`${v}%`}}/></div></div>)}</main>}
+import { getSessions } from '../services/lexi';
+export default function Progress(){
+  const sessions=getSessions();
+  const completed=sessions.filter(s=>s.completedAt);
+  const avg=completed.length?Math.round(completed.reduce((n,s)=>n+(s.accuracy||0),0)/completed.length):0;
+  return <main className="page"><div className="eyebrow">PARENT VIEW</div><h1>Progress</h1>
+    <div className="stats">
+      <div><strong>{completed.length}</strong><span>Sessions</span></div>
+      <div><strong>{avg}%</strong><span>Avg. accuracy</span></div>
+      <div><strong>{completed.reduce((n,s)=>n+(s.stars||0),0}</strong><span>Stars earned</span></div>
+    </div>
+    <h2>Recent sessions</h2>
+    <div className="session-list">{completed.length===0?<p className="muted">Complete a lesson to see session history.</p>:completed.slice(0,10).map(s=>
+      <div className="session-row" key={s.id}><div><strong>{new Date(s.startedAt).toLocaleDateString()}</strong><span>{new Date(s.startedAt).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}</span></div><div><strong>{s.accuracy}%</strong><span>{Math.round((s.durationMs||0)/60000)} min</span></div></div>
+    )}</div>
+  </main>
+}
