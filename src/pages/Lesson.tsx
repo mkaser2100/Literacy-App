@@ -21,6 +21,7 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
   const [feedback,setFeedback]=useState<'correct'|'incorrect'|null>(null);
   const [hintUsed,setHintUsed]=useState(false), [attemptNumber,setAttemptNumber]=useState(1);
   const [soundSwitchReady,setSoundSwitchReady]=useState(false);
+  const [soundCount,setSoundCount]=useState(0);
   const [firstTryCorrect,setFirstTryCorrect]=useState(0), [stars,setStars]=useState(0);
   const presentedAt=useRef(new Date().toISOString()), startedMs=useRef(Date.now());
   const activity=plan[index];
@@ -55,10 +56,10 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
   },[activity]);
 
   const builtWord=built.map(x=>x.split('::').slice(1).join('::')).join('');
-  const response=activity.type==='word_builder'?builtWord:selected;
+  const response=activity.type==='word_builder'?builtWord:activity.type==='sound_builder'?`${soundCount} sounds`:selected;
   const pct=((index+(feedback==='correct'?1:0))/plan.length)*100;
 
-  const reset=()=>{setSelected('');setBuilt([]);setFeedback(null);setHintUsed(false);setAttemptNumber(1);setSoundSwitchReady(false);presentedAt.current=new Date().toISOString();};
+  const reset=()=>{setSelected('');setBuilt([]);setFeedback(null);setHintUsed(false);setAttemptNumber(1);setSoundSwitchReady(false);setSoundCount(0);presentedAt.current=new Date().toISOString();};
 
   const submit=()=>{
     if(!response)return;
@@ -74,7 +75,7 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
     }
   };
 
-  const retry=()=>{setFeedback(null);setSelected('');setBuilt([]);setAttemptNumber(v=>v+1);setSoundSwitchReady(activity.type==='sound_switch');presentedAt.current=new Date().toISOString();};
+  const retry=()=>{setFeedback(null);setSelected('');setBuilt([]);setSoundCount(0);setAttemptNumber(v=>v+1);setSoundSwitchReady(activity.type==='sound_switch');presentedAt.current=new Date().toISOString();};
   const next=()=>{
     if(index===plan.length-1){
       const durationMs=Date.now()-startedMs.current, accuracy=Math.round(firstTryCorrect/plan.length*100);
@@ -118,7 +119,18 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
       {activity.audioText&&<button className="listen-button" onClick={playActivityAudio}><Volume2/> {activity.type==='mystery_words'?'Listen to sounds':'Listen'}</button>}
       <h2 className="prompt">{activity.prompt}</h2>
 
-      {activity.type==='word_builder'?<>
+      {activity.type==='sound_builder'?<>
+        <div className="sound-builder-stage">
+          <p className="builder-coach">Say the word slowly. Tap one box for every sound you hear.</p>
+          <div className="sound-map" aria-label="Tap one box for each sound">
+            {Array.from({length:5},(_,i)=><button key={i} type="button" disabled={!!feedback}
+              className={`sound-box ${i<soundCount?'filled':''}`}
+              onClick={()=>setSoundCount(i+1)}>{i<soundCount?'●':i+1}</button>)}
+          </div>
+          {soundCount>0&&!feedback&&<button className="clear-builder" onClick={()=>setSoundCount(0)}>Clear boxes</button>}
+          <p className="sound-count">{soundCount===0?'Tap the boxes as you hear each sound.':`${soundCount} ${soundCount===1?'sound':'sounds'}`}</p>
+        </div>
+      </>:activity.type==='word_builder'?<>
         <div className="sound-map" aria-label="Sound boxes">
           {(activity.tokens||[]).map((_,i)=><div key={i} className={`sound-box ${built[i]?'filled':''}`}>{built[i]?built[i].split('::').slice(1).join('::'):<span>{i+1}</span>}</div>)}
         </div>
