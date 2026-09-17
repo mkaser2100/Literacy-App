@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#7657e8" />
-  <title>Lexi Phoneme Recorder V3.1</title>
+  <title>Lexi Phoneme Recorder V3.2</title>
   <style>
     :root {
       font-family: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -60,7 +60,7 @@
 <body>
 <div class="app">
   <div class="topbar">
-    <div class="brand">LEXI · AUDIO STUDIO V3.1</div>
+    <div class="brand">LEXI · AUDIO STUDIO V3.2</div>
     <div id="count" class="progress-label">1 / 11</div>
   </div>
   <div class="progress"><div id="bar"></div></div>
@@ -146,7 +146,21 @@ function render() {
 
 async function ensureMic() {
   if (!navigator.mediaDevices?.getUserMedia) throw new Error('Microphone recording is not supported in this browser.');
-  if (!stream) stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+
+  // iOS Safari can leave a reused MediaStream alive but no longer delivering
+  // samples after the first MediaRecorder cycle. Always use a fresh stream.
+  if (stream) {
+    try { stream.getTracks().forEach(track => track.stop()); } catch (_) {}
+    stream = null;
+  }
+
+  stream = await navigator.mediaDevices.getUserMedia({
+    audio: {
+      echoCancellation: false,
+      noiseSuppression: false,
+      autoGainControl: false
+    }
+  });
   return stream;
 }
 
@@ -187,6 +201,10 @@ async function toggleRecord() {
 
     recorder.onerror = event => {
       status.textContent = 'Recording failed. Please try this sound again.';
+      if (stream) {
+        try { stream.getTracks().forEach(track => track.stop()); } catch (_) {}
+        stream = null;
+      }
       console.error('MediaRecorder error', event);
     };
 
@@ -196,6 +214,14 @@ async function toggleRecord() {
 
       const mimeType = recorder?.mimeType || preferred || 'audio/mp4';
       const blob = new Blob(chunks, { type: mimeType });
+
+      // Release this recording's microphone stream. The next take will request
+      // a fresh stream, avoiding iOS Safari's dead-stream-after-first-use bug.
+      if (stream) {
+        try { stream.getTracks().forEach(track => track.stop()); } catch (_) {}
+        stream = null;
+      }
+      recorder = null;
 
       // Never allow an empty/invalid take to be kept.
       if (!blob.size || blob.size < 500) {
