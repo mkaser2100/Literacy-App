@@ -43,3 +43,11 @@
 .mystery-orbs span{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#eee9ff;color:#7657e8;font-size:24px;line-height:1}
 .secondary-action{border:2px solid #7657e8;background:#fff;color:#6548cc;border-radius:14px;padding:12px 18px;font:900 14px Nunito;cursor:pointer}
 .mystery-choice-label{font-weight:900;color:#6d6680;margin:18px 0 10px}
+
+/* Sound Switch audio-first phoneme manipulation */
+.sound-switch-stage{border:2px dashed #d9d2ee;border-radius:20px;padding:22px;text-align:center;background:#fcfbff;margin:6px 0 8px}
+.sound-switch-stage p{margin:12px auto 18px;max-width:460px;color:#6d6680;font-weight:700}
+.sound-switch-orbs{display:flex;justify-content:center;align-items:center;gap:12px}
+.sound-switch-orbs span{min-width:40px;height:40px;border-radius:14px;display:grid;place-items:center;background:#eee9ff;color:#7657e8;font-size:17px;font-weight:900}
+.sound-switch-orbs span:nth-child(2){background:transparent;min-width:24px}
+.sound-switch-choice-label{font-weight:900;color:#6d6680;margin:18px 0 10px}
