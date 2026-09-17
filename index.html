@@ -55,6 +55,7 @@
       .sound { min-height:125px; }
     }
   </style>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 <body>
 <div class="app">
@@ -149,9 +150,9 @@ async function toggleRecord() {
   try {
     const mic = await ensureMic();
     chunks = [];
-    const preferred = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-      ? 'audio/webm;codecs=opus'
-      : (MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '');
+    const preferred = MediaRecorder.isTypeSupported('audio/mp4')
+      ? 'audio/mp4'
+      : (MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : '');
     recorder = preferred ? new MediaRecorder(mic, { mimeType: preferred }) : new MediaRecorder(mic);
     recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
     recorder.onstop = () => {
@@ -172,10 +173,19 @@ function showPlayback(blob) {
   const playback = document.getElementById('playback');
   const audio = document.getElementById('audio');
   if (!playback || !audio) return;
-  audio.src = URL.createObjectURL(blob);
+
+  // Safari/iPad can invalidate or stall an old object URL after playback.
+  // Give the player a fresh URL every time this take is shown.
+  if (audio.dataset.objectUrl) URL.revokeObjectURL(audio.dataset.objectUrl);
+  const url = URL.createObjectURL(blob);
+  audio.dataset.objectUrl = url;
+  audio.removeAttribute('src');
+  audio.load();
+  audio.src = url;
+  audio.preload = 'auto';
+  audio.load();
   playback.classList.add('show');
 }
-
 function keep() {
   if (!currentBlob) return;
   recordings.set(sounds[index].key, currentBlob);
@@ -190,14 +200,49 @@ function extensionFor(blob) {
   return 'webm';
 }
 
-function downloadOne(blob, name) {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+async function downloadAllZip() {
+  const status = document.getElementById('zipStatus');
+  const button = document.getElementById('download');
+  button.disabled = true;
+  button.textContent = 'Building ZIP…';
+
+  try {
+    if (typeof JSZip === 'undefined') {
+      throw new Error('ZIP support did not load. Check your internet connection and reload the page.');
+    }
+
+    const zip = new JSZip();
+    const folder = zip.folder('lexi-phonemes');
+
+    for (const s of sounds) {
+      const blob = recordings.get(s.key);
+      if (!blob) continue;
+      folder.file(`${s.key.replaceAll('_','-')}.${extensionFor(blob)}`, blob);
+    }
+
+    folder.file(
+      'README.txt',
+      'Lexi phoneme recordings. These are browser-native recordings. Convert the accepted takes to production MP3 files before placing them in public/audio/phonemes/.'
+    );
+
+    const archive = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+    const url = URL.createObjectURL(archive);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'lexi-phoneme-recordings.zip';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+
+    status.textContent = '✓ ZIP created. Check Files / Downloads.';
+    button.textContent = 'Download All as ZIP';
+  } catch (err) {
+    status.textContent = err.message || 'Could not create the ZIP.';
+    button.textContent = 'Try Download All Again';
+  } finally {
+    button.disabled = false;
+  }
 }
 
 function renderDone() {
@@ -210,21 +255,14 @@ function renderDone() {
       <div class="eyebrow">Recording session complete</div>
       <h1>${recordings.size} phonemes ready</h1>
       <p>${missing.length ? `${missing.length} sound${missing.length===1?' is':'s are'} still missing. You can go back and record them.` : 'You recorded the complete starter phoneme set.'}</p>
-      <button id="download" class="btn primary download" ${recordings.size===0?'disabled':''}>Download recordings</button>
+      <button id="download" class="btn primary download" ${recordings.size===0?'disabled':''}>Download All as ZIP</button>
+      <div id="zipStatus" class="status"></div>
       <button id="review" class="btn secondary download">Review recordings</button>
-      <p class="notice"><strong>Important:</strong> browsers record in their native audio format (usually WebM/Opus or M4A on iPad). This page intentionally does not fake an MP3 conversion. Send me the downloaded recordings and I can package/process them for Lexi, or convert them with a trusted audio tool before placing them in <code>public/audio/phonemes/</code>.</p>
+      <p class="notice"><strong>iPad note:</strong> the ZIP contains the actual browser-recorded files. We can convert the final accepted takes to Lexi's production MP3 files afterward.</p>
     </div>`;
   document.getElementById('review').onclick = () => { index=0; render(); };
-  document.getElementById('download').onclick = async () => {
-    for (const s of sounds) {
-      const blob = recordings.get(s.key);
-      if (!blob) continue;
-      downloadOne(blob, `${s.key.replaceAll('_','-')}.${extensionFor(blob)}`);
-      await new Promise(r => setTimeout(r, 350));
-    }
-  };
+  document.getElementById('download').onclick = downloadAllZip;
 }
-
 render();
 </script>
 </body>
