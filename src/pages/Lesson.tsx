@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Check, Lightbulb, Volume2, X } from 'lucide-react';
 import { buildAdaptiveLesson } from '../engine/lessonEngine';
 import { finishSession, getAttempts, saveAttempt, speak, startSession } from '../services/lexi';
+import { playPhonemeSequence } from '../services/phonemeAudio';
 
 function shuffle<T>(items:T[]):T[] {
   const result=[...items];
@@ -98,6 +99,14 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
   const renderChoices=(choices:string[]) =>
     <div className="choice-grid">{choices.map(c=><button key={c} disabled={!!feedback} className={`choice ${selected===c?'selected':''}`} onClick={()=>setSelected(c)}>{c}</button>)}</div>;
 
+  const playActivityAudio=()=>{
+    if(activity.type==='mystery_words' && activity.phonemes?.length){
+      void playPhonemeSequence(activity.phonemes);
+      return;
+    }
+    if(activity.audioText)speak(activity.audioText);
+  };
+
   return <main className="lesson-screen">
     <header className="lesson-top">
       <button className="icon-button" onClick={exit} aria-label="Exit lesson"><ArrowLeft/></button>
@@ -107,7 +116,7 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
     <section className="activity-card">
       <div className="activity-kicker">{activity.skillId}</div><h1>{activity.title}</h1>
       <p className="instruction">{activity.instruction}</p>
-      {activity.audioText&&<button className="listen-button" onClick={()=>speak(activity.audioText!)}><Volume2/> Listen</button>}
+      {activity.audioText&&<button className="listen-button" onClick={playActivityAudio}><Volume2/> {activity.type==='mystery_words'?'Listen to sounds':'Listen'}</button>}
       <h2 className="prompt">{activity.prompt}</h2>
 
       {activity.type==='word_builder'?<>
