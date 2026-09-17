@@ -6,6 +6,44 @@
     <meta name="theme-color" content="#7657e8" />
     <meta name="description" content="Lexi reading and decoding practice" />
     <title>Lexi</title>
+    <script>
+      // If the app fails before React can render, show the real browser error
+      // instead of leaving the user with a blank white page.
+      window.addEventListener('error', function (event) {
+        window.__lexiBootError = event.message || 'Unknown JavaScript error';
+        setTimeout(showLexiBootError, 0);
+      });
+      window.addEventListener('unhandledrejection', function (event) {
+        window.__lexiBootError =
+          (event.reason && (event.reason.stack || event.reason.message)) ||
+          String(event.reason || 'Unhandled promise rejection');
+        setTimeout(showLexiBootError, 0);
+      });
+      function showLexiBootError() {
+        if (!window.__lexiBootError) return;
+        var root = document.getElementById('root');
+        if (!root || root.childElementCount) return;
+        root.innerHTML =
+          '<main style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;padding:24px;max-width:720px;margin:auto">' +
+          '<h1 style="color:#6d4dde">Lexi could not start</h1>' +
+          '<p>Please send this error message back so the startup problem can be fixed:</p>' +
+          '<pre style="white-space:pre-wrap;background:#f4f0ff;padding:16px;border-radius:14px;color:#2a2344">' +
+          String(window.__lexiBootError).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}) +
+          '</pre></main>';
+      }
+      // Also catch the case where the module never loads/renders but no useful
+      // global error is surfaced by Safari.
+      window.addEventListener('load', function () {
+        setTimeout(function () {
+          var root = document.getElementById('root');
+          if (root && !root.childElementCount) {
+            window.__lexiBootError = window.__lexiBootError ||
+              'The Lexi JavaScript bundle loaded no visible React content.';
+            showLexiBootError();
+          }
+        }, 2500);
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
