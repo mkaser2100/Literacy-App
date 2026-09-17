@@ -3,6 +3,15 @@ import { ArrowLeft, Check, Lightbulb, Volume2, X } from 'lucide-react';
 import { buildAdaptiveLesson } from '../engine/lessonEngine';
 import { finishSession, getAttempts, saveAttempt, speak, startSession } from '../services/lexi';
 
+function shuffle<T>(items:T[]):T[] {
+  const result=[...items];
+  for(let i=result.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [result[i],result[j]]=[result[j],result[i]];
+  }
+  return result;
+}
+
 export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
   const session=useMemo(()=>startSession(),[]);
   const plan=useMemo(()=>buildAdaptiveLesson(getAttempts()),[]);
@@ -13,7 +22,20 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
   const [firstTryCorrect,setFirstTryCorrect]=useState(0), [stars,setStars]=useState(0);
   const presentedAt=useRef(new Date().toISOString()), startedMs=useRef(Date.now());
   const activity=plan[index];
-  const builtWord=built.map(x=>x.split(':').slice(1).join(':')).join('');
+
+  const wordBuilderTiles=useMemo(()=>{
+    if(activity.type!=='word_builder')return [];
+    const all=[...(activity.tokens||[]),...(activity.distractorTokens||[])];
+    let shuffled=shuffle(all.map((token,i)=>({id:`${activity.id}-${i}-${token}`,token})));
+    // Avoid accidentally showing the exact answer order when possible.
+    const joined=shuffled.map(x=>x.token).join('');
+    if(shuffled.length>1 && joined===activity.answer){
+      [shuffled[0],shuffled[1]]=[shuffled[1],shuffled[0]];
+    }
+    return shuffled;
+  },[activity]);
+
+  const builtWord=built.map(x=>x.split('::').slice(1).join('::')).join('');
   const response=activity.type==='word_builder'?builtWord:selected;
   const pct=((index+(feedback==='correct'?1:0))/plan.length)*100;
 
@@ -43,10 +65,16 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
     }
     setIndex(v=>v+1); reset();
   };
-  const toggleToken=(token:string,i:number)=>{
-    if(feedback)return; const key=`${i}:${token}`;
-    setBuilt(v=>v.includes(key)?v.filter(x=>x!==key):[...v,key]);
+
+  const addTile=(id:string,token:string)=>{
+    if(feedback||built.some(x=>x.startsWith(`${id}::`)))return;
+    setBuilt(v=>[...v,`${id}::${token}`]);
   };
+  const removeBuilt=(position:number)=>{
+    if(feedback)return;
+    setBuilt(v=>v.filter((_,i)=>i!==position));
+  };
+  const usedIds=new Set(built.map(x=>x.split('::')[0]));
 
   return <main className="lesson-screen">
     <header className="lesson-top">
@@ -59,10 +87,19 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
       <p className="instruction">{activity.instruction}</p>
       {activity.audioText&&<button className="listen-button" onClick={()=>speak(activity.audioText!)}><Volume2/> Listen</button>}
       <h2 className="prompt">{activity.prompt}</h2>
+
       {activity.type==='word_builder'?<>
-        <div className="build-zone">{built.length?built.map((x,i)=><span key={i}>{x.split(':').slice(1).join(':')}</span>):<em>Tap the sound parts below</em>}</div>
-        <div className="token-row">{activity.tokens?.map((t,i)=><button key={i} className={built.includes(`${i}:${t}`)?'token used':'token'} onClick={()=>toggleToken(t,i)}>{t}</button>)}</div>
+        <div className="sound-map" aria-label="Sound boxes">
+          {(activity.tokens||[]).map((_,i)=><div key={i} className={`sound-box ${built[i]?'filled':''}`}>{built[i]?built[i].split('::').slice(1).join('::'):<span>{i+1}</span>}</div>)}
+        </div>
+        <p className="builder-coach">Say the sounds slowly. Then tap the tiles in the order you hear them.</p>
+        <div className="token-row">
+          {wordBuilderTiles.map(tile=><button key={tile.id} disabled={usedIds.has(tile.id)||!!feedback}
+            className={usedIds.has(tile.id)?'token used':'token'} onClick={()=>addTile(tile.id,tile.token)}>{tile.token}</button>)}
+        </div>
+        {built.length>0&&!feedback&&<button className="clear-builder" onClick={()=>removeBuilt(built.length-1)}>Undo last tile</button>}
       </>:<div className="choice-grid">{activity.choices?.map(c=><button key={c} disabled={!!feedback} className={`choice ${selected===c?'selected':''}`} onClick={()=>setSelected(c)}>{c}</button>)}</div>}
+
       {feedback==='incorrect'&&<div className="feedback incorrect"><X/><div><strong>Not quite yet.</strong><p>{activity.hint}</p></div></div>}
       {feedback==='correct'&&<div className="feedback correct"><Check/><div><strong>Nice work!</strong><p>{hintUsed?'You used the clue and worked it out.':'You got it independently.'}</p></div></div>}
       {!feedback&&<button className="hint-link" onClick={()=>setHintUsed(true)}><Lightbulb size={18}/> {hintUsed?activity.hint:'Need a hint?'}</button>}
