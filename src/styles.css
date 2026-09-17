@@ -26,3 +26,11 @@
 .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:min(560px,100%);margin:12px 0 24px}.summary-grid div{background:rgba(255,255,255,.08);padding:16px 8px;border-radius:16px}.summary-grid strong,.summary-grid span{display:block}.summary-grid strong{font-size:21px}.summary-grid span{font-size:12px;color:#cbd0df;margin-top:4px}.primary.light{background:white;color:#4f3cb6;max-width:360px}
 .session-list{display:grid;gap:10px}.session-row{display:flex;justify-content:space-between;background:white;border:1px solid #ece9f5;border-radius:16px;padding:14px 16px}.session-row>div:last-child{text-align:right}.session-row strong,.session-row span{display:block}.session-row span{font-size:12px;color:#7a7489;margin-top:3px}
 @media(max-width:520px){.activity-card{padding:22px 18px}.summary-grid{grid-template-columns:repeat(2,1fr)}.prompt{font-size:21px}}
+/* Word Builder audio-first redesign */
+.sound-map{display:flex;justify-content:center;gap:12px;margin:4px 0 12px}
+.sound-box{width:62px;height:62px;border:2px solid #d9d2ee;border-radius:16px;display:grid;place-items:center;font-size:22px;font-weight:900;color:#30284a;background:#fff}
+.sound-box span{font-size:12px;color:#aaa3ba;font-weight:800}
+.sound-box.filled{border-color:#7657e8;background:#f3efff}
+.builder-coach{text-align:center;color:#777087;font-size:14px;font-weight:700;margin:0 0 16px}
+.clear-builder{display:block;margin:-2px auto 10px;border:0;background:transparent;color:#7657e8;font:800 13px Nunito;cursor:pointer}
+@media(max-width:520px){.sound-box{width:54px;height:54px}.token-row{flex-wrap:wrap}}
