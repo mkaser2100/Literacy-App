@@ -19,6 +19,7 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
   const [built,setBuilt]=useState<string[]>([]);
   const [feedback,setFeedback]=useState<'correct'|'incorrect'|null>(null);
   const [hintUsed,setHintUsed]=useState(false), [attemptNumber,setAttemptNumber]=useState(1);
+  const [mysteryReady,setMysteryReady]=useState(false);
   const [firstTryCorrect,setFirstTryCorrect]=useState(0), [stars,setStars]=useState(0);
   const presentedAt=useRef(new Date().toISOString()), startedMs=useRef(Date.now());
   const activity=plan[index];
@@ -26,10 +27,18 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
   const wordBuilderTiles=useMemo(()=>{
     if(activity.type!=='word_builder')return [];
     const all=[...(activity.tokens||[]),...(activity.distractorTokens||[])];
-    let shuffled=shuffle(all.map((token,i)=>({id:`${activity.id}-${i}-${token}`,token})));
-    // Avoid accidentally showing the exact answer order when possible.
+    const shuffled=shuffle(all.map((token,i)=>({id:`${activity.id}-${i}-${token}`,token})));
     const joined=shuffled.map(x=>x.token).join('');
     if(shuffled.length>1 && joined===activity.answer){
+      [shuffled[0],shuffled[1]]=[shuffled[1],shuffled[0]];
+    }
+    return shuffled;
+  },[activity]);
+
+  const mysteryChoices=useMemo(()=>{
+    if(activity.type!=='mystery_words')return activity.choices||[];
+    const shuffled=shuffle(activity.choices||[]);
+    if(shuffled.length>1 && shuffled[0]===activity.answer){
       [shuffled[0],shuffled[1]]=[shuffled[1],shuffled[0]];
     }
     return shuffled;
@@ -39,7 +48,7 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
   const response=activity.type==='word_builder'?builtWord:selected;
   const pct=((index+(feedback==='correct'?1:0))/plan.length)*100;
 
-  const reset=()=>{setSelected('');setBuilt([]);setFeedback(null);setHintUsed(false);setAttemptNumber(1);presentedAt.current=new Date().toISOString();};
+  const reset=()=>{setSelected('');setBuilt([]);setFeedback(null);setHintUsed(false);setAttemptNumber(1);setMysteryReady(false);presentedAt.current=new Date().toISOString();};
 
   const submit=()=>{
     if(!response)return;
@@ -55,7 +64,7 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
     }
   };
 
-  const retry=()=>{setFeedback(null);setSelected('');setBuilt([]);setAttemptNumber(v=>v+1);presentedAt.current=new Date().toISOString();};
+  const retry=()=>{setFeedback(null);setSelected('');setBuilt([]);setAttemptNumber(v=>v+1);setMysteryReady(activity.type==='mystery_words');presentedAt.current=new Date().toISOString();};
   const next=()=>{
     if(index===plan.length-1){
       const durationMs=Date.now()-startedMs.current, accuracy=Math.round(firstTryCorrect/plan.length*100);
@@ -75,6 +84,9 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
     setBuilt(v=>v.filter((_,i)=>i!==position));
   };
   const usedIds=new Set(built.map(x=>x.split('::')[0]));
+
+  const renderChoices=(choices:string[]) =>
+    <div className="choice-grid">{choices.map(c=><button key={c} disabled={!!feedback} className={`choice ${selected===c?'selected':''}`} onClick={()=>setSelected(c)}>{c}</button>)}</div>;
 
   return <main className="lesson-screen">
     <header className="lesson-top">
@@ -98,12 +110,22 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
             className={usedIds.has(tile.id)?'token used':'token'} onClick={()=>addTile(tile.id,tile.token)}>{tile.token}</button>)}
         </div>
         {built.length>0&&!feedback&&<button className="clear-builder" onClick={()=>removeBuilt(built.length-1)}>Undo last tile</button>}
-      </>:<div className="choice-grid">{activity.choices?.map(c=><button key={c} disabled={!!feedback} className={`choice ${selected===c?'selected':''}`} onClick={()=>setSelected(c)}>{c}</button>)}</div>}
+      </>:activity.type==='mystery_words'?<>
+        {!mysteryReady?<div className="mystery-listen-stage">
+          <div className="mystery-orbs" aria-hidden="true"><span>•</span><span>•</span><span>•</span>{activity.difficulty>=3&&<span>•</span>}</div>
+          <p>Listen, hold the sounds in your head, and blend them together.</p>
+          <button className="secondary-action" onClick={()=>setMysteryReady(true)}>I know it — show choices</button>
+        </div>:<>
+          <p className="mystery-choice-label">Which mystery word did you hear?</p>
+          {renderChoices(mysteryChoices)}
+        </>}
+      </>:renderChoices(activity.choices||[])}
 
       {feedback==='incorrect'&&<div className="feedback incorrect"><X/><div><strong>Not quite yet.</strong><p>{activity.hint}</p></div></div>}
       {feedback==='correct'&&<div className="feedback correct"><Check/><div><strong>Nice work!</strong><p>{hintUsed?'You used the clue and worked it out.':'You got it independently.'}</p></div></div>}
       {!feedback&&<button className="hint-link" onClick={()=>setHintUsed(true)}><Lightbulb size={18}/> {hintUsed?activity.hint:'Need a hint?'}</button>}
-      {!feedback&&<button className="primary" disabled={!response} onClick={submit}>Check</button>}
+      {!feedback&&activity.type!=='mystery_words'&&<button className="primary" disabled={!response} onClick={submit}>Check</button>}
+      {!feedback&&activity.type==='mystery_words'&&mysteryReady&&<button className="primary" disabled={!response} onClick={submit}>Check</button>}
       {feedback==='incorrect'&&<button className="primary" onClick={retry}>Try Again</button>}
       {feedback==='correct'&&<button className="primary" onClick={next}>{index===plan.length-1?'Finish Lesson':'Continue'}</button>}
     </section>
