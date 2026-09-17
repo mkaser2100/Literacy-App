@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap');:root{font-family:Nunito,system-ui,sans-serif;color:#28223b;background:#f5f2fb;font-synthesis:none}*{box-sizing:border-box}body{margin:0}.app,.lesson,.complete{max-width:480px;margin:auto;min-height:100vh;background:#fff}.screen{padding:28px 24px 110px;min-height:100vh}header{display:flex;gap:16px;align-items:flex-start;justify-content:space-between}h1{font-size:30px;line-height:1.12;margin:7px 0 22px}h2{font-size:25px;margin:10px 0 2px}h3{margin-top:28px}.eyebrow{font-weight:900;font-size:12px;letter-spacing:1.4px;color:#7856c7}.avatar{min-width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#eee7ff;color:#6b47c8;font-weight:900}.stats,.rewardGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stats>div,.rewardGrid>div{border:1px solid #ece7f4;border-radius:18px;padding:15px;display:grid;grid-template-columns:auto 1fr;gap:0 8px;align-items:center}.stats svg,.rewardGrid svg{grid-row:1/3;color:#7654c6}.stats span,.rewardGrid span{font-size:12px;color:#817b8e}.hero{margin-top:18px;padding:22px;border-radius:26px;background:linear-gradient(145deg,#f0eaff,#fbf9ff);border:1px solid #e7defa}.pill{display:inline-block;background:#e8defd;color:#6948b8;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:900;letter-spacing:.6px}.lessonRow{display:flex;gap:13px;align-items:center;margin:18px 0}.lessonRow div:last-child{display:flex;flex-direction:column}.orb{width:54px;height:54px;border-radius:18px;background:#7654c6;color:white;display:grid;place-items:center;font-weight:900}.primary{width:100%;border:0;border-radius:16px;padding:16px;background:#7452c5;color:white;font:800 16px Nunito;display:flex;gap:8px;justify-content:center;align-items:center;box-shadow:0 5px 0 #5f3fac}.week{display:flex;justify-content:space-between}.week div{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#f1eef6;font-weight:800}.week .done{background:#e9defd;color:#6845bd}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(480px,100%);height:82px;background:white;border-top:1px solid #eee9f4;display:flex;justify-content:space-around;padding-top:10px}.nav button{border:0;background:none;color:#9690a2;display:flex;flex-direction:column;align-items:center;gap:4px;font:700 11px Nunito}.nav .active{color:#704dc3}.lessonTop{display:flex;gap:12px;align-items:center;margin-bottom:32px}.icon{border:0;background:#f3eff9;border-radius:12px;padding:8px}.bar{height:10px;background:#eeeaf4;border-radius:99px;overflow:hidden;flex:1}.bar i{height:100%;display:block;background:#7654c6;border-radius:99px}.sound{border:0;background:#f0eaff;color:#6948b8;padding:12px 16px;border-radius:14px;font:800 14px Nunito;display:flex;gap:8px}.choices{display:grid;gap:12px;margin-top:28px}.choices button{padding:22px;border:2px solid #e8e2f0;border-radius:18px;background:white;font:900 24px Nunito}.choices .selected{border-color:#7654c6;background:#f5f0ff}.feedback{padding:16px;border-radius:16px;margin-top:18px;display:flex;flex-direction:column}.feedback.good{background:#edf8ef;color:#286c38}.feedback.bad{background:#fff1ef;color:#9a4035}.bottom{margin-top:24px}.complete{text-align:center;padding-top:90px}.trophy{width:130px;height:130px;border-radius:50%;margin:0 auto 24px;display:grid;place-items:center;background:#efe7ff;color:#7654c6}.complete .rewardGrid{text-align:left;margin:28px 0}.path{display:grid;gap:16px;margin-top:25px}.node{display:flex;align-items:center;gap:16px;padding:16px;border-radius:18px;background:#f8f6fb}.node b{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#7654c6;color:white}.node.locked{opacity:.48}.tabs{display:flex;gap:24px;border-bottom:1px solid #eee;padding-bottom:12px;margin-bottom:18px}.tabs b{color:#704dc3}.parent{grid-template-columns:repeat(3,1fr)}.parent>div{display:flex;flex-direction:column;text-align:center}.skill{margin:20px 0}.skill>div:first-child{display:flex;justify-content:space-between;margin-bottom:7px}@media(min-width:700px){body{padding:28px}.app,.lesson,.complete{border-radius:28px;overflow:hidden;box-shadow:0 20px 60px rgba(60,40,100,.12);min-height:calc(100vh - 56px)}.nav{bottom:28px}}
+
+/* Phase 2 learning interactions */
+.lesson-screen{min-height:100vh;background:#fbfbfe;padding:22px 18px 40px}
+.lesson-top{max-width:720px;margin:0 auto 26px;display:flex;align-items:center;gap:14px}
+.icon-button{border:0;background:transparent;color:#17213d;display:grid;place-items:center;padding:8px}
+.progress-track{height:12px;background:#eceaf5;border-radius:999px;flex:1;overflow:hidden}
+.progress-fill{height:100%;background:#7657e8;border-radius:999px;transition:width .25s ease}
+.step-count{font-weight:900;color:#6d6680}
+.activity-card{max-width:680px;margin:auto;background:#fff;border:1px solid #ece9f5;border-radius:28px;padding:30px;box-shadow:0 16px 40px rgba(42,31,83,.07)}
+.activity-kicker,.eyebrow{font-size:12px;letter-spacing:.12em;font-weight:900;color:#7657e8}
+.activity-card h1{margin:6px 0 6px;font-size:30px}.instruction{color:#6d6680;font-weight:700;margin-top:0}
+.prompt{font-size:24px;line-height:1.35;margin:24px 0 18px;color:#17213d}
+.listen-button{border:0;background:#eee9ff;color:#5d43cc;border-radius:16px;padding:12px 16px;font-weight:900;display:flex;gap:8px;align-items:center}
+.choice-grid{display:grid;gap:12px}.choice{padding:17px;border:2px solid #e5e1ef;background:#fff;border-radius:16px;font:inherit;font-weight:900;color:#27314e;text-align:left}
+.choice.selected{border-color:#7657e8;background:#f3efff}
+.hint-link{margin:18px 0 12px;border:0;background:transparent;color:#7657e8;font-weight:900;display:flex;gap:7px;align-items:flex-start;text-align:left}
+.feedback{margin:18px 0;padding:15px;border-radius:16px;display:flex;gap:12px;align-items:flex-start}.feedback p{margin:4px 0 0}
+.feedback.correct{background:#eaf9ef;color:#207345}.feedback.incorrect{background:#fff0f2;color:#a13c50}
+.build-zone{min-height:72px;border:2px dashed #d9d2ee;border-radius:18px;padding:14px;display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:16px}
+.build-zone span,.token{font-size:22px;font-weight:900}.build-zone span{background:#eee9ff;padding:10px 12px;border-radius:12px}
+.build-zone em{color:#8b849b;font-style:normal;font-weight:700}.token-row{display:flex;justify-content:center;gap:12px;margin-bottom:14px}.token{border:2px solid #dcd6eb;background:white;border-radius:14px;padding:12px 16px}.token.used{opacity:.35}
+.primary:disabled{opacity:.4;cursor:not-allowed}
+.complete-screen{min-height:100vh;background:#18213d;color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px}.complete-screen h1{font-size:38px;margin:18px 0 4px}.complete-screen p{color:#d4d8e8}
+.star-badge{margin:20px;background:#7657e8;padding:14px 22px;border-radius:999px;font-size:20px;font-weight:900;display:flex;gap:8px;align-items:center}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:min(560px,100%);margin:12px 0 24px}.summary-grid div{background:rgba(255,255,255,.08);padding:16px 8px;border-radius:16px}.summary-grid strong,.summary-grid span{display:block}.summary-grid strong{font-size:21px}.summary-grid span{font-size:12px;color:#cbd0df;margin-top:4px}.primary.light{background:white;color:#4f3cb6;max-width:360px}
+.session-list{display:grid;gap:10px}.session-row{display:flex;justify-content:space-between;background:white;border:1px solid #ece9f5;border-radius:16px;padding:14px 16px}.session-row>div:last-child{text-align:right}.session-row strong,.session-row span{display:block}.session-row span{font-size:12px;color:#7a7489;margin-top:3px}
+@media(max-width:520px){.activity-card{padding:22px 18px}.summary-grid{grid-template-columns:repeat(2,1fr)}.prompt{font-size:21px}}
+
+/* Word Builder audio-first redesign */
+.sound-map{display:flex;justify-content:center;gap:12px;margin:4px 0 12px}
+.sound-box{width:62px;height:62px;border:2px solid #d9d2ee;border-radius:16px;display:grid;place-items:center;font-size:22px;font-weight:900;color:#30284a;background:#fff}
+.sound-box span{font-size:12px;color:#aaa3ba;font-weight:800}
+.sound-box.filled{border-color:#7657e8;background:#f3efff}
+.builder-coach{text-align:center;color:#777087;font-size:14px;font-weight:700;margin:0 0 16px}
+.clear-builder{display:block;margin:-2px auto 10px;border:0;background:transparent;color:#7657e8;font:800 13px Nunito;cursor:pointer}
+@media(max-width:520px){.sound-box{width:54px;height:54px}.token-row{flex-wrap:wrap}}
+
+/* Mystery Words audio-first blending */
+.mystery-listen-stage{border:2px dashed #d9d2ee;border-radius:20px;padding:22px;text-align:center;background:#fcfbff;margin:6px 0 8px}
+.mystery-listen-stage p{margin:10px auto 18px;max-width:430px;color:#6d6680;font-weight:700}
+.mystery-orbs{display:flex;justify-content:center;gap:14px}
+.mystery-orbs span{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#eee9ff;color:#7657e8;font-size:24px;line-height:1}
+.secondary-action{border:2px solid #7657e8;background:#fff;color:#6548cc;border-radius:14px;padding:12px 18px;font:900 14px Nunito;cursor:pointer}
+.mystery-choice-label{font-weight:900;color:#6d6680;margin:18px 0 10px}
+
+/* Sound Switch audio-first phoneme manipulation */
+.sound-switch-stage{border:2px dashed #d9d2ee;border-radius:20px;padding:22px;text-align:center;background:#fcfbff;margin:6px 0 8px}
+.sound-switch-stage p{margin:12px auto 18px;max-width:460px;color:#6d6680;font-weight:700}
+.sound-switch-orbs{display:flex;justify-content:center;align-items:center;gap:12px}
+.sound-switch-orbs span{min-width:40px;height:40px;border-radius:14px;display:grid;place-items:center;background:#eee9ff;color:#7657e8;font-size:17px;font-weight:900}
+.sound-switch-orbs span:nth-child(2){background:transparent;min-width:24px}
+.sound-switch-choice-label{font-weight:900;color:#6d6680;margin:18px 0 10px}
