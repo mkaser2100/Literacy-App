@@ -5,7 +5,7 @@ export type ActivityType =
 export type Activity = {
   id: string; type: ActivityType; skillId: string; title: string;
   instruction: string; prompt: string; audioText?: string;
-  choices?: string[]; tokens?: string[]; answer: string;
+  choices?: string[]; tokens?: string[]; distractorTokens?: string[]; answer: string;
   hint: string; difficulty: number;
 };
 
@@ -25,10 +25,10 @@ export const activityBank: Activity[] = [
   {id:'ss3',type:'sound_switch',skillId:'PA-05',title:'Sound Switch',instruction:'Take away one sound.',prompt:'Say “snap” without /s/.',audioText:'snap',choices:['nap','sap','snap'],answer:'nap',hint:'Start with /s/ /n/ /ă/ /p/. Take away only /s/.',difficulty:3},
   {id:'ss4',type:'sound_switch',skillId:'PA-05',title:'Sound Switch',instruction:'Take away one sound.',prompt:'Say “fist” without /s/.',audioText:'fist',choices:['fit','fish','ist'],answer:'fit',hint:'Say /f/ /ĭ/ /s/ /t/, then remove /s/.',difficulty:3},
 
-  {id:'wb1',type:'word_builder',skillId:'DC-02',title:'Word Builder',instruction:'Build the word from its sound parts.',prompt:'Build “ship”.',audioText:'ship',tokens:['sh','i','p'],answer:'ship',hint:'Listen: /sh/ /ĭ/ /p/.',difficulty:2},
-  {id:'wb2',type:'word_builder',skillId:'DC-02',title:'Word Builder',instruction:'Build the word from its sound parts.',prompt:'Build “chat”.',audioText:'chat',tokens:['ch','a','t'],answer:'chat',hint:'Listen: /ch/ /ă/ /t/.',difficulty:2},
-  {id:'wb3',type:'word_builder',skillId:'DC-03',title:'Word Builder',instruction:'Build the word from its sound parts.',prompt:'Build “stop”.',audioText:'stop',tokens:['s','t','o','p'],answer:'stop',hint:'Keep both sounds in the beginning blend: /s/ /t/.',difficulty:3},
-  {id:'wb4',type:'word_builder',skillId:'DC-03',title:'Word Builder',instruction:'Build the word from its sound parts.',prompt:'Build “brush”.',audioText:'brush',tokens:['b','r','u','sh'],answer:'brush',hint:'Listen for /b/ /r/ /ŭ/ /sh/.',difficulty:3},
+  {id:'wb1',type:'word_builder',skillId:'DC-02',title:'Word Builder',instruction:'Listen to the word. Build it from left to right.',prompt:'Build the word you hear.',audioText:'ship',tokens:['sh','i','p'],answer:'ship',hint:'Say the sounds slowly: /sh/ /ĭ/ /p/. Which sound comes first?',difficulty:2},
+  {id:'wb2',type:'word_builder',skillId:'DC-02',title:'Word Builder',instruction:'Listen to the word. Build it from left to right.',prompt:'Build the word you hear.',audioText:'chat',tokens:['ch','a','t'],answer:'chat',hint:'Say the sounds slowly: /ch/ /ă/ /t/. Which sound comes first?',difficulty:2},
+  {id:'wb3',type:'word_builder',skillId:'DC-03',title:'Word Builder',instruction:'Listen to the word. Build it from left to right.',prompt:'Build the word you hear.',audioText:'stop',tokens:['s','t','o','p'],distractorTokens:['a'],answer:'stop',hint:'Stretch the beginning blend: /s/ /t/. Then listen for the middle vowel.',difficulty:3},
+  {id:'wb4',type:'word_builder',skillId:'DC-03',title:'Word Builder',instruction:'Listen to the word. Build it from left to right.',prompt:'Build the word you hear.',audioText:'brush',tokens:['b','r','u','sh'],distractorTokens:['a'],answer:'brush',hint:'Stretch it: /b/ /r/ /ŭ/ /sh/. Keep both sounds in the beginning blend.',difficulty:3},
 
   {id:'mw1',type:'mystery_words',skillId:'DC-03',title:'Mystery Words',instruction:'Decode the pretend word from left to right.',prompt:'Which word says /sh/ /ă/ /p/?',choices:['shap','chap','sap'],answer:'shap',hint:'Blend /sh/ … /ă/ … /p/.',difficulty:2},
   {id:'mw2',type:'mystery_words',skillId:'DC-03',title:'Mystery Words',instruction:'Decode the pretend word from left to right.',prompt:'Which word says /ch/ /ĭ/ /m/?',choices:['chim','shim','cham'],answer:'chim',hint:'Blend /ch/ … /ĭ/ … /m/.',difficulty:2},
