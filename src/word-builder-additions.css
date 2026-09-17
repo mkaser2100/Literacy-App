@@ -1,0 +1,9 @@
+
+/* Word Builder audio-first redesign */
+.sound-map{display:flex;justify-content:center;gap:12px;margin:4px 0 12px}
+.sound-box{width:62px;height:62px;border:2px solid #d9d2ee;border-radius:16px;display:grid;place-items:center;font-size:22px;font-weight:900;color:#30284a;background:#fff}
+.sound-box span{font-size:12px;color:#aaa3ba;font-weight:800}
+.sound-box.filled{border-color:#7657e8;background:#f3efff}
+.builder-coach{text-align:center;color:#777087;font-size:14px;font-weight:700;margin:0 0 16px}
+.clear-builder{display:block;margin:-2px auto 10px;border:0;background:transparent;color:#7657e8;font:800 13px Nunito;cursor:pointer}
+@media(max-width:520px){.sound-box{width:54px;height:54px}.token-row{flex-wrap:wrap}}
