@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#7657e8" />
-  <title>Lexi Phoneme Recorder V3</title>
+  <title>Lexi Phoneme Recorder V3.1</title>
   <style>
     :root {
       font-family: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -60,7 +60,7 @@
 <body>
 <div class="app">
   <div class="topbar">
-    <div class="brand">LEXI · AUDIO STUDIO V3</div>
+    <div class="brand">LEXI · AUDIO STUDIO V3.1</div>
     <div id="count" class="progress-label">1 / 11</div>
   </div>
   <div class="progress"><div id="bar"></div></div>
@@ -91,6 +91,21 @@ const recordings = new Map();
 const card = document.getElementById('card');
 const count = document.getElementById('count');
 const bar = document.getElementById('bar');
+
+function cleanupPlayback() {
+  const audio = document.getElementById('audio');
+  if (audio) {
+    try { audio.pause(); } catch (_) {}
+    if (audio.dataset && audio.dataset.objectUrl) {
+      try { URL.revokeObjectURL(audio.dataset.objectUrl); } catch (_) {}
+      delete audio.dataset.objectUrl;
+    }
+    try {
+      audio.removeAttribute('src');
+      audio.load();
+    } catch (_) {}
+  }
+}
 
 function render() {
   if (index >= sounds.length) return renderDone();
