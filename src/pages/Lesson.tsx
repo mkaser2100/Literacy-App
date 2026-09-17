@@ -20,6 +20,7 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
   const [feedback,setFeedback]=useState<'correct'|'incorrect'|null>(null);
   const [hintUsed,setHintUsed]=useState(false), [attemptNumber,setAttemptNumber]=useState(1);
   const [mysteryReady,setMysteryReady]=useState(false);
+  const [soundSwitchReady,setSoundSwitchReady]=useState(false);
   const [firstTryCorrect,setFirstTryCorrect]=useState(0), [stars,setStars]=useState(0);
   const presentedAt=useRef(new Date().toISOString()), startedMs=useRef(Date.now());
   const activity=plan[index];
@@ -44,11 +45,20 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
     return shuffled;
   },[activity]);
 
+  const soundSwitchChoices=useMemo(()=>{
+    if(activity.type!=='sound_switch')return activity.choices||[];
+    const shuffled=shuffle(activity.choices||[]);
+    if(shuffled.length>1 && shuffled[0]===activity.answer){
+      [shuffled[0],shuffled[1]]=[shuffled[1],shuffled[0]];
+    }
+    return shuffled;
+  },[activity]);
+
   const builtWord=built.map(x=>x.split('::').slice(1).join('::')).join('');
   const response=activity.type==='word_builder'?builtWord:selected;
   const pct=((index+(feedback==='correct'?1:0))/plan.length)*100;
 
-  const reset=()=>{setSelected('');setBuilt([]);setFeedback(null);setHintUsed(false);setAttemptNumber(1);setMysteryReady(false);presentedAt.current=new Date().toISOString();};
+  const reset=()=>{setSelected('');setBuilt([]);setFeedback(null);setHintUsed(false);setAttemptNumber(1);setMysteryReady(false);setSoundSwitchReady(false);presentedAt.current=new Date().toISOString();};
 
   const submit=()=>{
     if(!response)return;
@@ -64,7 +74,7 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
     }
   };
 
-  const retry=()=>{setFeedback(null);setSelected('');setBuilt([]);setAttemptNumber(v=>v+1);setMysteryReady(activity.type==='mystery_words');presentedAt.current=new Date().toISOString();};
+  const retry=()=>{setFeedback(null);setSelected('');setBuilt([]);setAttemptNumber(v=>v+1);setMysteryReady(activity.type==='mystery_words');setSoundSwitchReady(activity.type==='sound_switch');presentedAt.current=new Date().toISOString();};
   const next=()=>{
     if(index===plan.length-1){
       const durationMs=Date.now()-startedMs.current, accuracy=Math.round(firstTryCorrect/plan.length*100);
@@ -110,6 +120,15 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
             className={usedIds.has(tile.id)?'token used':'token'} onClick={()=>addTile(tile.id,tile.token)}>{tile.token}</button>)}
         </div>
         {built.length>0&&!feedback&&<button className="clear-builder" onClick={()=>removeBuilt(built.length-1)}>Undo last tile</button>}
+      </>:activity.type==='sound_switch'?<>
+        {!soundSwitchReady?<div className="sound-switch-stage">
+          <div className="sound-switch-orbs" aria-hidden="true"><span>1</span><span>→</span><span>?</span></div>
+          <p>Listen to the whole word. Make the sound change in your head before you look at any words.</p>
+          <button className="secondary-action" onClick={()=>setSoundSwitchReady(true)}>I know it — show choices</button>
+        </div>:<>
+          <p className="sound-switch-choice-label">Which word did you make?</p>
+          {renderChoices(soundSwitchChoices)}
+        </>}
       </>:activity.type==='mystery_words'?<>
         {!mysteryReady?<div className="mystery-listen-stage">
           <div className="mystery-orbs" aria-hidden="true"><span>•</span><span>•</span><span>•</span>{activity.difficulty>=3&&<span>•</span>}</div>
@@ -124,8 +143,9 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
       {feedback==='incorrect'&&<div className="feedback incorrect"><X/><div><strong>Not quite yet.</strong><p>{activity.hint}</p></div></div>}
       {feedback==='correct'&&<div className="feedback correct"><Check/><div><strong>Nice work!</strong><p>{hintUsed?'You used the clue and worked it out.':'You got it independently.'}</p></div></div>}
       {!feedback&&<button className="hint-link" onClick={()=>setHintUsed(true)}><Lightbulb size={18}/> {hintUsed?activity.hint:'Need a hint?'}</button>}
-      {!feedback&&activity.type!=='mystery_words'&&<button className="primary" disabled={!response} onClick={submit}>Check</button>}
+      {!feedback&&activity.type!=='mystery_words'&&activity.type!=='sound_switch'&&<button className="primary" disabled={!response} onClick={submit}>Check</button>}
       {!feedback&&activity.type==='mystery_words'&&mysteryReady&&<button className="primary" disabled={!response} onClick={submit}>Check</button>}
+      {!feedback&&activity.type==='sound_switch'&&soundSwitchReady&&<button className="primary" disabled={!response} onClick={submit}>Check</button>}
       {feedback==='incorrect'&&<button className="primary" onClick={retry}>Try Again</button>}
       {feedback==='correct'&&<button className="primary" onClick={next}>{index===plan.length-1?'Finish Lesson':'Continue'}</button>}
     </section>
