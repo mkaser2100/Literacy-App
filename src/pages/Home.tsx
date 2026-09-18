@@ -1,2 +1,48 @@
-import{Flame,Star,Play}from'lucide-react';
-export default function Home({start}:{start:()=>void}){return <main className="screen"><header><div><p className="eyebrow">GOOD MORNING</p><h1>Ready to train your reading superpowers?</h1></div><div className="avatar">L</div></header><div className="stats"><div><Flame/> <b>6</b><span>day streak</span></div><div><Star/> <b>120</b><span>stars</span></div></div><section className="hero"><span className="pill">LEVEL 3</span><h2>Sound-Symbol Superpowers</h2><p>Today’s Adaptive Lesson</p><div className="lessonRow"><div className="orb">Aa</div><div><b>6 skill blocks</b><span>10–15 minutes</span></div></div><button className="primary" onClick={start}><Play size={20} fill="currentColor"/> Start Lesson</button></section><section><h3>Keep your streak alive</h3><div className="week">{['M','T','W','T','F','S','S'].map((d,i)=><div key={i} className={i<6?'done':''}>{i<6?'✓':d}</div>)}</div></section></main>}
+import { Flame, Play, Star, Target, BarChart3, Trophy, Sparkles } from 'lucide-react';
+import { getSessions } from '../services/lexi';
+
+export default function Home({start}:{start:()=>void}) {
+  const completed=getSessions().filter(s=>s.completedAt);
+  const totalStars=completed.reduce((n,s)=>n+(s.stars||0),0);
+  const streak=6;
+
+  return <main className="screen home-screen">
+    <header className="home-header">
+      <div className="lexi-brand">Lexi</div>
+      <div className="header-score">
+        <span className="score-item streak"><Flame size={20} fill="currentColor"/><b>{streak}</b></span>
+        <span className="score-item stars"><Star size={20} fill="currentColor"/><b>{totalStars}</b></span>
+      </div>
+    </header>
+
+    <section className="home-greeting">
+      <p className="eyebrow">TODAY</p>
+      <h1>Good morning!</h1>
+      <p>Small steps. Big progress.</p>
+    </section>
+
+    <section className="today-card">
+      <div className="today-card-copy">
+        <span className="today-label"><Sparkles size={15}/> TODAY'S LESSON</span>
+        <h2>Sound-Symbol<br/>Superpowers</h2>
+        <p>10–15 min <span>•</span> 6 activities</p>
+        <div className="lesson-goal"><Target size={18}/><span>Build decoding skills</span></div>
+      </div>
+      <button className="lesson-play" onClick={start} aria-label="Start today's lesson"><Play size={27} fill="currentColor"/></button>
+    </section>
+
+    <section className="home-landscape" aria-label="Braver readers, brighter futures">
+      <div className="sun"/>
+      <div className="mountain mountain-back"/>
+      <div className="mountain mountain-mid"/>
+      <div className="mountain mountain-front"/>
+      <div className="landscape-copy"><strong>Braver readers.</strong><span>Brighter futures.</span></div>
+    </section>
+
+    <section className="quick-actions">
+      <div><span className="quick-icon"><Target size={22}/></span><b>Practice</b></div>
+      <div><span className="quick-icon"><BarChart3 size={22}/></span><b>My Progress</b></div>
+      <div><span className="quick-icon"><Trophy size={22}/></span><b>Rewards</b></div>
+    </section>
+  </main>;
+}
