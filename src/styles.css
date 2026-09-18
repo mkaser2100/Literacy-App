@@ -101,3 +101,40 @@
 .complete-stats{width:min(390px,100%);display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.complete-stats>div{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);border-radius:17px;padding:13px 6px;display:flex;flex-direction:column;align-items:center}.complete-stat-icon{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;margin-bottom:5px}.complete-stat-icon svg{width:17px}.complete-stat-icon.green{background:#244c43;color:#5bd19b}.complete-stat-icon.purple{background:#40366a;color:#ad94ff}.complete-stat-icon.blue{background:#253f5c;color:#76b7ef}.complete-stats strong{font-size:17px}.complete-stats small{font-size:9px;color:#aeb4c9;margin-top:2px}
 .streak-panel{width:min(390px,100%);margin:13px 0 17px;background:linear-gradient(90deg,rgba(244,122,61,.16),rgba(255,255,255,.05));border:1px solid rgba(244,142,84,.22);border-radius:17px;padding:13px 15px;display:flex;align-items:center;text-align:left;gap:12px;color:#ff945c}.streak-panel div{display:flex;flex-direction:column;color:white}.streak-panel strong{font-size:13px}.streak-panel span{font-size:10px;color:#bfc4d4;margin-top:2px}
 .complete-button{max-width:390px;box-shadow:0 5px 0 #4f37a8}.back-home{border:0;background:none;color:#aeb5ca;font:800 11px Nunito;margin-top:12px}.confetti i{position:absolute;width:7px;height:14px;border-radius:2px;background:#8d70ec;transform:rotate(25deg)}.confetti i:nth-child(1){left:12%;top:14%;background:#f7c85b}.confetti i:nth-child(2){left:23%;top:24%;background:#53c996;transform:rotate(-35deg)}.confetti i:nth-child(3){right:15%;top:17%;background:#ed6d87}.confetti i:nth-child(4){right:28%;top:9%;background:#f7c85b}.confetti i:nth-child(5){left:8%;top:42%;background:#6eb4ed}.confetti i:nth-child(6){right:8%;top:38%;background:#8d70ec}.confetti i:nth-child(7){left:33%;top:8%;background:#ed6d87}.confetti i:nth-child(8){right:35%;top:28%;background:#53c996}.confetti i:nth-child(9){left:17%;top:62%;background:#f7c85b}.confetti i:nth-child(10){right:18%;top:64%;background:#6eb4ed}
+
+
+/* Drop 4: final UX polish */
+/* Tighter, more intentional learning-path rhythm */
+.level-map{height:515px}
+.map-trail{top:91px;height:370px}
+.step-1{top:418px}.step-2{top:352px}.step-3{top:282px}.step-4{top:214px}.step-5{top:148px}.step-6{top:82px}
+.map-label{width:138px;padding:7px 9px}
+.map-node{width:55px;height:55px}.map-step.active .map-node{width:63px;height:63px}
+.level-progress{margin-top:15px}
+
+/* Give locked rewards more purpose without making them visually noisy */
+.reward-level.locked{opacity:.72;background:linear-gradient(90deg,#fff,#faf9fc)}
+.reward-level.locked .level-medal{background:#f2eff6;color:#9a93a4}
+.reward-level .unlock-note{grid-column:2;font-size:8px!important;color:#9a93a4!important;margin-top:5px!important;font-weight:800!important}
+.reward-level.active{transform:translateY(-1px)}
+.reward-level.done{background:linear-gradient(90deg,#fff,#fbfffd)}
+
+/* Parent dashboard readability */
+.parent-note{margin:11px 0 2px;color:#827b8e;font-size:11px;line-height:1.45;font-weight:700}
+.skill-bar>div:first-child b{font-size:11px;color:#3e384b}
+.dashboard-section{box-shadow:0 5px 18px rgba(65,48,106,.035)}
+.parent-summary>div{box-shadow:0 4px 13px rgba(65,48,106,.025)}
+
+/* Slightly stronger quick-action differentiation from Drop 1 */
+.quick-actions>div:nth-child(1) .quick-icon{background:#eee9ff;color:#7352d6}
+.quick-actions>div:nth-child(2) .quick-icon{background:#eaf6f2;color:#318b68}
+.quick-actions>div:nth-child(3) .quick-icon{background:#fff4dc;color:#c38b1c}
+
+/* iPad/mobile density refinements */
+@media(min-width:700px){
+  .screen{padding-top:22px}
+  .home-greeting{margin-top:28px}
+  .today-card{margin-top:20px}
+  .home-landscape{height:148px;margin-top:18px}
+  .quick-actions{margin-top:18px}
+}
