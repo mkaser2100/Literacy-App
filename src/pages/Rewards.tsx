@@ -27,7 +27,7 @@ export default function Rewards(){
         return <div className={`reward-level ${done?'done':''} ${active?'active':''} ${n>3?'locked':''}`} key={name}>
           <div className="level-medal">{done?<Check/>:active?<Sparkles/>:n>3?<Lock/>:<Medal/>}</div>
           <div><small>LEVEL {n}</small><b>{name}</b><span>{desc}</span></div>
-          {active&&<em>CURRENT</em>}
+          {active&&<em>CURRENT</em>}{n>3&&<span className="unlock-note">Keep practicing to unlock</span>}
         </div>
       })}
     </section>

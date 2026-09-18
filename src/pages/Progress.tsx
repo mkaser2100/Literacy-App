@@ -1,7 +1,18 @@
 import { calculateMastery } from '../engine/lessonEngine';
 import { getAttempts, getSessions } from '../services/lexi';
 
-const pretty=(s:string)=>s.replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+const skillNames:Record<string,string>={
+  'pa-isolation':'Sound Isolation',
+  'pa-segment':'Sound Segmentation',
+  'pa-blend':'Sound Blending',
+  'pa-delete':'Sound Deletion',
+  'pa-substitute':'Sound Substitution',
+  'sound-symbol':'Sound-Symbol Mapping',
+  'decoding-nonsense':'Mystery Word Decoding',
+  'decoding':'Word Decoding',
+  'decoding-fluency':'Decoding Fluency'
+};
+const pretty=(s:string)=>skillNames[s]||s.replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
 
 export default function Progress(){
   const sessions=getSessions(),completed=sessions.filter(s=>s.completedAt),mastery=calculateMastery(getAttempts());
@@ -11,6 +22,7 @@ export default function Progress(){
   return <main className="screen parent-screen">
     <div className="parent-title"><div><p className="eyebrow">PARENT VIEW</p><h1>Progress</h1></div><span className="parent-lock">Parent</span></div>
     <div className="parent-tabs"><button className="active">Overview</button><button>Skills</button><button>Sessions</button></div>
+    <p className="parent-note">A quick look at recent practice, developing skills, and independent accuracy.</p>
     <section className="parent-summary">
       <div><strong>{completed.length}</strong><span>Sessions</span><small>completed</small></div>
       <div><strong>{avgMin}m</strong><span>Avg. time</span><small>per lesson</small></div>
