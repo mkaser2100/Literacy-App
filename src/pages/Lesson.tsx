@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Check, Lightbulb, Volume2, X } from 'lucide-react';
-import { buildAdaptiveLesson } from '../engine/lessonEngine';
-import { finishSession, getAttempts, saveAttempt, speak, startSession } from '../services/lexi';
+import { buildAdaptiveLesson, calculateMastery } from '../engine/lessonEngine';
+import { finishSession, getAttempts, saveAttempt, speak, startSession, syncSkillProgress } from '../services/lexi';
 import { playPhonemeSequence } from '../services/phonemeAudio';
 
 function shuffle<T>(items:T[]):T[] {
@@ -22,6 +22,7 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
   const [hintUsed,setHintUsed]=useState(false), [attemptNumber,setAttemptNumber]=useState(1);
   const [soundSwitchReady,setSoundSwitchReady]=useState(false);
   const [soundCount,setSoundCount]=useState(0);
+  const [saving,setSaving]=useState(false);
   const [firstTryCorrect,setFirstTryCorrect]=useState(0), [stars,setStars]=useState(0);
   const presentedAt=useRef(new Date().toISOString()), startedMs=useRef(Date.now());
   const activity=plan[index];
@@ -61,27 +62,44 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
 
   const reset=()=>{setSelected('');setBuilt([]);setFeedback(null);setHintUsed(false);setAttemptNumber(1);setSoundSwitchReady(false);setSoundCount(0);presentedAt.current=new Date().toISOString();};
 
-  const submit=()=>{
-    if(!response)return;
+  const submit=async()=>{
+    if(!response||saving)return;
     const correct=response===activity.answer, now=new Date();
-    saveAttempt({sessionId:session.id,activityId:activity.id,activityType:activity.type,skillId:activity.skillId,
-      contentId:activity.id,presentedAt:presentedAt.current,answeredAt:now.toISOString(),response,
-      correctAnswer:activity.answer,isCorrect:correct,responseTimeMs:now.getTime()-new Date(presentedAt.current).getTime(),
-      hintUsed,attemptNumber,difficulty:activity.difficulty});
-    setFeedback(correct?'correct':'incorrect');
-    if(correct){
-      if(attemptNumber===1&&!hintUsed){setFirstTryCorrect(v=>v+1);setStars(v=>v+3);}
-      else if(hintUsed)setStars(v=>v+2); else setStars(v=>v+1);
-    }
+    const contentId=activity.type==='reading_mission'?activity.id.replace(/-q\d+$/,''):activity.id;
+    setSaving(true);
+    try{
+      await saveAttempt({sessionId:session.id,activityId:activity.id,activityType:activity.type,skillId:activity.skillId,
+        contentId,presentedAt:presentedAt.current,answeredAt:now.toISOString(),response,
+        correctAnswer:activity.answer,isCorrect:correct,responseTimeMs:now.getTime()-new Date(presentedAt.current).getTime(),
+        hintUsed,attemptNumber,difficulty:activity.difficulty});
+      const progress=calculateMastery(getAttempts());
+      await syncSkillProgress(progress);
+      setFeedback(correct?'correct':'incorrect');
+      if(correct){
+        if(attemptNumber===1&&!hintUsed){setFirstTryCorrect(v=>v+1);setStars(v=>v+3);}
+        else if(hintUsed)setStars(v=>v+2); else setStars(v=>v+1);
+      }
+    }catch(err){
+      console.error(err);
+      alert('Lexi could not save this answer. Please check the connection and try again.');
+    }finally{setSaving(false);}
   };
 
   const retry=()=>{setFeedback(null);setSelected('');setBuilt([]);setSoundCount(0);setAttemptNumber(v=>v+1);setSoundSwitchReady(activity.type==='sound_switch');presentedAt.current=new Date().toISOString();};
-  const next=()=>{
+
+  const next=async()=>{
+    if(saving)return;
     if(index===plan.length-1){
       const durationMs=Date.now()-startedMs.current, accuracy=Math.round(firstTryCorrect/plan.length*100);
-      finishSession(session.id,{completedAt:new Date().toISOString(),durationMs,itemCount:plan.length,correctCount:firstTryCorrect,accuracy,stars,xp:20+plan.length*3});
-      localStorage.setItem('lexi_last_summary',JSON.stringify({durationMs,accuracy,stars,xp:20+plan.length*3}));
-      done(); return;
+      setSaving(true);
+      try{
+        await finishSession(session.id,{completedAt:new Date().toISOString(),durationMs,itemCount:plan.length,correctCount:firstTryCorrect,accuracy,stars,xp:20+plan.length*3});
+        done();
+      }catch(err){
+        console.error(err);
+        alert('Lexi could not finish saving this lesson. Please check the connection and try again.');
+      }finally{setSaving(false);}
+      return;
     }
     setIndex(v=>v+1); reset();
   };
@@ -97,7 +115,7 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
   const usedIds=new Set(built.map(x=>x.split('::')[0]));
 
   const renderChoices=(choices:string[]) =>
-    <div className="choice-grid">{choices.map(c=><button key={c} disabled={!!feedback} className={`choice ${selected===c?'selected':''}`} onClick={()=>setSelected(c)}>{c}</button>)}</div>;
+    <div className="choice-grid">{choices.map(c=><button key={c} disabled={!!feedback||saving} className={`choice ${selected===c?'selected':''}`} onClick={()=>setSelected(c)}>{c}</button>)}</div>;
 
   const playActivityAudio=()=>{
     if(activity.type==='mystery_words' && activity.phonemes?.length){
@@ -123,7 +141,7 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
         <div className="sound-builder-stage">
           <p className="builder-coach">Say the word slowly. Tap one box for every sound you hear.</p>
           <div className="sound-map" aria-label="Tap one box for each sound">
-            {Array.from({length:5},(_,i)=><button key={i} type="button" disabled={!!feedback}
+            {Array.from({length:5},(_,i)=><button key={i} type="button" disabled={!!feedback||saving}
               className={`sound-box ${i<soundCount?'filled':''}`}
               onClick={()=>setSoundCount(i+1)}>{i<soundCount?'●':i+1}</button>)}
           </div>
@@ -136,7 +154,7 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
         </div>
         <p className="builder-coach">Say the sounds slowly. Then tap the tiles in the order you hear them.</p>
         <div className="token-row">
-          {wordBuilderTiles.map(tile=><button key={tile.id} disabled={usedIds.has(tile.id)||!!feedback}
+          {wordBuilderTiles.map(tile=><button key={tile.id} disabled={usedIds.has(tile.id)||!!feedback||saving}
             className={usedIds.has(tile.id)?'token used':'token'} onClick={()=>addTile(tile.id,tile.token)}>{tile.token}</button>)}
         </div>
         {built.length>0&&!feedback&&<button className="clear-builder" onClick={()=>removeBuilt(built.length-1)}>Undo last tile</button>}
@@ -151,7 +169,7 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
         </>}
       </>:activity.type==='mystery_words'?<>
         <div className="mystery-listen-stage">
-          <div className="mystery-orbs" aria-hidden="true"><span>•</span><span>•</span><span>•</span>{activity.difficulty>=3&&<span>•</span>}</div>
+          <div className="mystery-orbs" aria-hidden="true"><span>•</span><span>•</span><span>•</span>{activity.difficulty>=3&&<span>•</span>}{activity.difficulty>=5&&<span>•</span>}</div>
           <p>Listen to each sound, blend them together, then choose the mystery word.</p>
         </div>
         <p className="mystery-choice-label">Which mystery word did you hear?</p>
@@ -160,12 +178,11 @@ export default function Lesson({done,exit}:{done:()=>void;exit:()=>void}) {
 
       {feedback==='incorrect'&&<div className="feedback incorrect"><X/><div><strong>Not quite yet.</strong><p>{activity.hint}</p></div></div>}
       {feedback==='correct'&&<div className="feedback correct"><Check/><div><strong>Nice work!</strong><p>{hintUsed?'You used the clue and worked it out.':'You got it independently.'}</p></div></div>}
-      {!feedback&&<button className="hint-link" onClick={()=>setHintUsed(true)}><Lightbulb size={18}/> {hintUsed?activity.hint:'Need a hint?'}</button>}
-      {!feedback&&activity.type!=='mystery_words'&&activity.type!=='sound_switch'&&<button className="primary" disabled={!response} onClick={submit}>Check</button>}
-      {!feedback&&activity.type==='mystery_words'&&<button className="primary" disabled={!response} onClick={submit}>Check</button>}
-      {!feedback&&activity.type==='sound_switch'&&soundSwitchReady&&<button className="primary" disabled={!response} onClick={submit}>Check</button>}
+      {!feedback&&<button className="hint-link" disabled={saving} onClick={()=>setHintUsed(true)}><Lightbulb size={18}/> {hintUsed?activity.hint:'Need a hint?'}</button>}
+      {!feedback&&activity.type!=='sound_switch'&&<button className="primary" disabled={!response||saving} onClick={submit}>{saving?'Saving…':'Check'}</button>}
+      {!feedback&&activity.type==='sound_switch'&&soundSwitchReady&&<button className="primary" disabled={!response||saving} onClick={submit}>{saving?'Saving…':'Check'}</button>}
       {feedback==='incorrect'&&<button className="primary" onClick={retry}>Try Again</button>}
-      {feedback==='correct'&&<button className="primary" onClick={next}>{index===plan.length-1?'Finish Lesson':'Continue'}</button>}
+      {feedback==='correct'&&<button className="primary" disabled={saving} onClick={next}>{saving?'Saving…':index===plan.length-1?'Finish Lesson':'Continue'}</button>}
     </section>
   </main>;
 }
