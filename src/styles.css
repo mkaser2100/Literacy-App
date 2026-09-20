@@ -67,7 +67,6 @@
 @media(max-width:520px){.activity-card{padding:22px 18px}.summary-grid{grid-template-columns:repeat(2,1fr)}.prompt{font-size:21px}.sound-box{width:54px;height:54px}.token-row{flex-wrap:wrap}}
 @media(min-width:700px){body{padding:28px}.app,.lesson,.complete{border-radius:28px;overflow:hidden;box-shadow:0 20px 60px rgba(60,40,100,.12);min-height:calc(100vh - 56px)}.nav{bottom:28px}}
 
-
 /* Drop 2: Journey */
 .journey-screen{background:linear-gradient(#fff 0 19%,#f5f6ff 42%,#fff 100%);padding-left:0;padding-right:0}
 .journey-heading{padding:0 24px}.journey-heading h1{margin:5px 0 16px;font-size:31px}
@@ -102,35 +101,25 @@
 .streak-panel{width:min(390px,100%);margin:13px 0 17px;background:linear-gradient(90deg,rgba(244,122,61,.16),rgba(255,255,255,.05));border:1px solid rgba(244,142,84,.22);border-radius:17px;padding:13px 15px;display:flex;align-items:center;text-align:left;gap:12px;color:#ff945c}.streak-panel div{display:flex;flex-direction:column;color:white}.streak-panel strong{font-size:13px}.streak-panel span{font-size:10px;color:#bfc4d4;margin-top:2px}
 .complete-button{max-width:390px;box-shadow:0 5px 0 #4f37a8}.back-home{border:0;background:none;color:#aeb5ca;font:800 11px Nunito;margin-top:12px}.confetti i{position:absolute;width:7px;height:14px;border-radius:2px;background:#8d70ec;transform:rotate(25deg)}.confetti i:nth-child(1){left:12%;top:14%;background:#f7c85b}.confetti i:nth-child(2){left:23%;top:24%;background:#53c996;transform:rotate(-35deg)}.confetti i:nth-child(3){right:15%;top:17%;background:#ed6d87}.confetti i:nth-child(4){right:28%;top:9%;background:#f7c85b}.confetti i:nth-child(5){left:8%;top:42%;background:#6eb4ed}.confetti i:nth-child(6){right:8%;top:38%;background:#8d70ec}.confetti i:nth-child(7){left:33%;top:8%;background:#ed6d87}.confetti i:nth-child(8){right:35%;top:28%;background:#53c996}.confetti i:nth-child(9){left:17%;top:62%;background:#f7c85b}.confetti i:nth-child(10){right:18%;top:64%;background:#6eb4ed}
 
-
 /* Drop 4: final UX polish */
-/* Tighter, more intentional learning-path rhythm */
 .level-map{height:515px}
 .map-trail{top:91px;height:370px}
 .step-1{top:418px}.step-2{top:352px}.step-3{top:282px}.step-4{top:214px}.step-5{top:148px}.step-6{top:82px}
 .map-label{width:138px;padding:7px 9px}
 .map-node{width:55px;height:55px}.map-step.active .map-node{width:63px;height:63px}
 .level-progress{margin-top:15px}
-
-/* Give locked rewards more purpose without making them visually noisy */
 .reward-level.locked{opacity:.72;background:linear-gradient(90deg,#fff,#faf9fc)}
 .reward-level.locked .level-medal{background:#f2eff6;color:#9a93a4}
 .reward-level .unlock-note{grid-column:2;font-size:8px!important;color:#9a93a4!important;margin-top:5px!important;font-weight:800!important}
 .reward-level.active{transform:translateY(-1px)}
 .reward-level.done{background:linear-gradient(90deg,#fff,#fbfffd)}
-
-/* Parent dashboard readability */
 .parent-note{margin:11px 0 2px;color:#827b8e;font-size:11px;line-height:1.45;font-weight:700}
 .skill-bar>div:first-child b{font-size:11px;color:#3e384b}
 .dashboard-section{box-shadow:0 5px 18px rgba(65,48,106,.035)}
 .parent-summary>div{box-shadow:0 4px 13px rgba(65,48,106,.025)}
-
-/* Slightly stronger quick-action differentiation from Drop 1 */
 .quick-actions>div:nth-child(1) .quick-icon{background:#eee9ff;color:#7352d6}
 .quick-actions>div:nth-child(2) .quick-icon{background:#eaf6f2;color:#318b68}
 .quick-actions>div:nth-child(3) .quick-icon{background:#fff4dc;color:#c38b1c}
-
-/* iPad/mobile density refinements */
 @media(min-width:700px){
   .screen{padding-top:22px}
   .home-greeting{margin-top:28px}
@@ -138,16 +127,117 @@
   .home-landscape{height:148px;margin-top:18px}
   .quick-actions{margin-top:18px}
 }
-
-/* Interaction fix */
 .quick-actions>button{border:0;background:transparent;text-align:center;display:flex;flex-direction:column;align-items:center;gap:7px;color:#514b60;font:800 12px Nunito;cursor:pointer;padding:0}
 .quick-actions>button:nth-child(1) .quick-icon{background:#eee9ff;color:#7352d6}.quick-actions>button:nth-child(2) .quick-icon{background:#eaf6f2;color:#318b68}.quick-actions>button:nth-child(3) .quick-icon{background:#fff4dc;color:#c38b1c}
 .badge-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.badge-card{border:1px solid var(--line);border-radius:18px;padding:15px;display:flex;flex-direction:column;gap:5px;background:#faf9fc;color:#8f8899}.badge-card>span{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#f0edf5}.badge-card b{font-size:12px}.badge-card small{font-size:9px;line-height:1.35}.badge-card.earned{background:#f8f5ff;color:var(--purple);border-color:#d8cef7}
 .streak-view{text-align:center;border:1px solid var(--line);border-radius:22px;padding:26px 18px;background:#fff}.streak-view>svg{color:var(--orange)}.streak-view h2{font-size:23px}.streak-view p{font-size:12px;color:#7f788c;line-height:1.5}.streak-week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:18px}.streak-week span{aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:#f1eef5;font-size:10px;font-weight:900}.streak-week span.done{background:#fff0e7;color:#ef7740}
-
-/* Parent dashboard clarity fix */
 .focus-list{display:grid;gap:10px}.focus-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid #f0edf4}.focus-row:first-child{border-top:0}.focus-row>div{display:flex;flex-direction:column}.focus-row b{font-size:12px}.focus-row span{font-size:10px;color:#827b8e;line-height:1.35;margin-top:2px}
 .focus-row em,.skill-detail-head em{font-style:normal;font-size:9px;font-weight:900;border-radius:99px;padding:5px 8px;white-space:nowrap}.emerging{background:#fff0e7;color:#b75d2e}.developing{background:#fff6d9;color:#98700e}.secure{background:#e9f6f1;color:#287a5b}.mastered{background:#eee9ff;color:#6849c5}
 .parent-insight{margin-top:14px;border-radius:20px;padding:17px;background:linear-gradient(135deg,#eee9ff,#f8f6ff);display:flex;flex-direction:column}.parent-insight span{font-size:9px;letter-spacing:1.2px;font-weight:900;color:#7352d6}.parent-insight b{font-size:16px;margin-top:5px}.parent-insight p{font-size:10px;color:#70697e;line-height:1.45;margin:4px 0 0}
 .latest-session{display:flex;align-items:center;gap:14px}.latest-session>strong{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;background:#eee9ff;color:#7352d6;font-size:19px}.latest-session>div{display:flex;flex-direction:column}.latest-session b{font-size:12px}.latest-session span{font-size:10px;color:#8b8497;margin-top:3px}
 .skills-detail{display:grid;gap:12px;margin-top:18px}.skill-detail-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 5px 18px rgba(65,48,106,.035)}.skill-detail-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.skill-detail-head h2{font-size:15px;margin:0}.skill-detail-head p{font-size:10px;color:#7d768a;line-height:1.4;margin:4px 0 0}.mastery-line{display:flex;justify-content:space-between;margin-top:14px;font-size:10px}.mastery-line span{font-weight:800;color:#817a8d}.mastery-line b{color:#7352d6}.skill-track.large{height:8px;margin-top:5px}.skill-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}.skill-metrics>div{background:#faf9fc;border-radius:12px;padding:9px;text-align:center;display:flex;flex-direction:column}.skill-metrics b{font-size:13px}.skill-metrics span{font-size:8px;color:#8d8698;margin-top:2px}
+
+/* Responsive layout — tablet and desktop
+   Mobile remains the baseline design above. */
+@media (min-width:700px){
+  body{padding:24px}
+  .app,.lesson,.complete{
+    width:min(92vw,1180px);
+    max-width:none;
+    min-height:calc(100vh - 48px);
+    border-radius:28px;
+    overflow:hidden;
+    box-shadow:0 20px 60px rgba(60,40,100,.12)
+  }
+  .nav{
+    width:min(92vw,1180px);
+    bottom:24px;
+    padding-left:clamp(24px,5vw,70px);
+    padding-right:clamp(24px,5vw,70px)
+  }
+  .screen{
+    width:100%;
+    max-width:1040px;
+    margin:0 auto;
+    padding:30px clamp(32px,5vw,64px) 118px
+  }
+  .lesson-screen{
+    padding:30px clamp(28px,4vw,56px) 54px
+  }
+  .lesson-top{
+    max-width:900px;
+    margin-bottom:30px
+  }
+  .activity-card{
+    max-width:900px;
+    padding:clamp(34px,4vw,52px);
+    border-radius:30px
+  }
+  .activity-card h1{font-size:clamp(32px,4vw,40px)}
+  .instruction{font-size:17px}
+  .prompt{font-size:clamp(25px,3vw,30px)}
+  .choice-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .choice{min-height:62px;padding:18px 20px}
+  .listen-button,.secondary-action{min-height:50px}
+  .mystery-listen-stage,.sound-switch-stage{padding:28px}
+  .home-header,.home-greeting{max-width:100%}
+  .today-card{min-height:220px;padding:30px 110px 28px 30px}
+  .today-card h2{font-size:31px}
+  .lesson-play{right:30px;top:82px;width:66px;height:66px}
+  .home-landscape{height:190px}
+  .quick-actions{gap:18px}
+  .quick-icon{width:56px;height:56px}
+  .reward-summary,.parent-summary{gap:16px}
+  .dashboard-section{padding:24px}
+  .skills-detail{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .skill-detail-card{padding:20px}
+  .badge-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .journey-heading{padding:0 clamp(32px,5vw,64px)}
+  .level-progress{margin-left:clamp(32px,5vw,64px);margin-right:clamp(32px,5vw,64px)}
+  .complete-stats,.streak-panel,.complete-button{width:min(560px,100%);max-width:560px}
+}
+
+@media (min-width:1000px){
+  body{padding:32px}
+  .app,.lesson,.complete{
+    width:min(94vw,1180px);
+    min-height:calc(100vh - 64px)
+  }
+  .nav{
+    width:min(94vw,1180px);
+    bottom:32px
+  }
+  .screen{
+    max-width:1100px;
+    padding-left:56px;
+    padding-right:56px
+  }
+  .home-screen{
+    display:grid;
+    grid-template-columns:minmax(0,1.12fr) minmax(320px,.88fr);
+    grid-template-areas:
+      "header header"
+      "greeting greeting"
+      "today landscape"
+      "actions actions";
+    column-gap:28px;
+    align-content:start
+  }
+  .home-header{grid-area:header}
+  .home-greeting{grid-area:greeting}
+  .today-card{grid-area:today;margin-top:22px;min-height:245px}
+  .home-landscape{grid-area:landscape;margin-top:22px;height:245px}
+  .quick-actions{grid-area:actions;margin-top:24px}
+  .lesson-top,.activity-card{max-width:980px}
+  .activity-card{padding:54px 60px}
+  .choice-grid{gap:16px}
+  .choice{font-size:17px}
+  .reward-summary>div,.parent-summary>div{padding:20px 12px}
+  .skills-detail{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media (min-width:1280px){
+  .app,.lesson,.complete,.nav{width:min(92vw,1180px)}
+  .activity-card{max-width:1000px}
+  .lesson-top{max-width:1000px}
+}
