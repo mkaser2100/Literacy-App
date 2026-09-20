@@ -14,6 +14,11 @@ export type Session = {
 
 export type LessonSummary={durationMs:number;accuracy:number;stars:number;xp:number};
 
+export type ProgressSyncRow={
+  skillId:string; currentLevel:number; score:number; accuracy:number; independentRate:number;
+  retentionRate:number; attempts:number; status:string; lastPracticedAt:string;
+};
+
 const LEGACY_ATTEMPTS_KEY='lexi_phase2_attempts';
 const LEGACY_SESSIONS_KEY='lexi_phase2_sessions';
 
@@ -78,8 +83,6 @@ async function migrateLegacyBrowserHistory(){
 
   const {error}=await supabase.rpc('lexi_import_legacy',{p_sessions:sessions,p_attempts:attempts});
   rpcError('Import existing Lexi history',error);
-
-  // Only delete the browser copy after the database transaction succeeds.
   localStorage.removeItem(LEGACY_SESSIONS_KEY);
   localStorage.removeItem(LEGACY_ATTEMPTS_KEY);
 }
@@ -106,38 +109,40 @@ export function startSession():Session{
   return session;
 }
 
-export function saveAttempt(attempt:Attempt){
+export async function saveAttempt(attempt:Attempt){
+  const pending=startWrites.get(attempt.sessionId);
+  if(pending) await pending;
+  const {error}=await supabase.rpc('lexi_save_attempt',{
+    p_session_id:attempt.sessionId,p_activity_id:attempt.activityId,p_activity_type:attempt.activityType,
+    p_skill_code:attempt.skillId,p_content_id:attempt.contentId,p_presented_at:attempt.presentedAt,
+    p_answered_at:attempt.answeredAt,p_response:attempt.response,p_correct_answer:attempt.correctAnswer,
+    p_is_correct:attempt.isCorrect,p_response_ms:attempt.responseTimeMs,p_hint_used:attempt.hintUsed,
+    p_attempt_number:attempt.attemptNumber,p_difficulty:attempt.difficulty
+  });
+  rpcError('Save lesson attempt',error);
   attemptsCache=[...attemptsCache,attempt];
-  void (async()=>{
-    const pending=startWrites.get(attempt.sessionId);
-    if(pending) await pending;
-    const {error}=await supabase.rpc('lexi_save_attempt',{
-      p_session_id:attempt.sessionId,p_activity_id:attempt.activityId,p_activity_type:attempt.activityType,
-      p_skill_code:attempt.skillId,p_content_id:attempt.contentId,p_presented_at:attempt.presentedAt,
-      p_answered_at:attempt.answeredAt,p_response:attempt.response,p_correct_answer:attempt.correctAnswer,
-      p_is_correct:attempt.isCorrect,p_response_ms:attempt.responseTimeMs,p_hint_used:attempt.hintUsed,
-      p_attempt_number:attempt.attemptNumber,p_difficulty:attempt.difficulty
-    });
-    rpcError('Save lesson attempt',error);
-  })().catch(err=>console.error(err));
 }
 
-export function finishSession(id:string,summary:Omit<Session,'id'|'startedAt'>){
+export async function syncSkillProgress(rows:ProgressSyncRow[]){
+  if(!rows.length)return;
+  const {error}=await supabase.rpc('lexi_sync_skill_progress',{p_rows:rows});
+  rpcError('Sync adaptive skill progress',error);
+}
+
+export async function finishSession(id:string,summary:Omit<Session,'id'|'startedAt'>){
+  const pending=startWrites.get(id);
+  if(pending) await pending;
+  const {error}=await supabase.rpc('lexi_finish_session',{
+    p_session_id:id,p_completed_at:summary.completedAt,p_duration_ms:summary.durationMs||0,
+    p_item_count:summary.itemCount||0,p_correct_count:summary.correctCount||0,
+    p_stars:summary.stars||0,p_xp:summary.xp||0
+  });
+  rpcError('Finish lesson session',error);
   sessionsCache=sessionsCache.map(s=>s.id===id?{...s,...summary}:s);
   lastSummary={
     durationMs:summary.durationMs||0,accuracy:summary.accuracy||0,
     stars:summary.stars||0,xp:summary.xp||0
   };
-  void (async()=>{
-    const pending=startWrites.get(id);
-    if(pending) await pending;
-    const {error}=await supabase.rpc('lexi_finish_session',{
-      p_session_id:id,p_completed_at:summary.completedAt,p_duration_ms:summary.durationMs||0,
-      p_item_count:summary.itemCount||0,p_correct_count:summary.correctCount||0,
-      p_stars:summary.stars||0,p_xp:summary.xp||0
-    });
-    rpcError('Finish lesson session',error);
-  })().catch(err=>console.error(err));
 }
 
 export const getAttempts=()=>attemptsCache;
